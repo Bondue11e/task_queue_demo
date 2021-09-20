@@ -2,6 +2,8 @@
 #include <thread>
 #include <condition_variable>
 #include <iostream>
+#include <vector>
+#include <atomic>
 
 class task_queue {
 
@@ -40,17 +42,7 @@ public:
 			}));
 		}
 	}
-	explicit task_queue(int worker_count) {
-		// TODO: multiple workers
-		worker = std::thread([this]() {
-			std::unique_lock<std::mutex> l(m);
-			for (;;) {
-				if (done)
-					break;
-				cv.wait(l);
-			}
-		});
-	}
+
 
 	~task_queue() {
 		{
