@@ -61,6 +61,15 @@ public:
 		std::cout << "\tВсе потоки свободны\n";
 	}
 
+	void enqueue(std::function<void()> task) 
+	{
+		std::unique_lock<std::mutex> l(m);
+
+		tasks.push_back(task);
+
+		cv.notify_one();
+	}
+
 private:
 
 	std::thread worker;
