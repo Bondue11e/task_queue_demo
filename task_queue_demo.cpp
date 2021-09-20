@@ -46,15 +46,19 @@ public:
 
 	~task_queue() {
 		{
-			std::lock_guard<std::mutex> l(m);
+			std::unique_lock<std::mutex> l(m);
 			done = true;
 			cv.notify_all();
 		}
-		worker.join();
-	}
 
-	void enqueue(std::function<void()> task) {
-		// TODO
+		for (unsigned int i = 0; i < workers.size(); i++)
+		{
+			workers[i].detach();
+			std::cout <<i+1<< " Поток высвобожден\n";
+		}
+
+		workers.clear();
+		std::cout << "\tВсе потоки свободны\n";
 	}
 
 private:
