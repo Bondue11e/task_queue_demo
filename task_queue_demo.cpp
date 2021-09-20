@@ -72,7 +72,8 @@ public:
 
 private:
 
-	std::thread worker;
+	std::vector <std::thread> workers;
+	std::vector <std::function<void()>> tasks;
 
 	std::mutex m;
 	std::condition_variable cv;
