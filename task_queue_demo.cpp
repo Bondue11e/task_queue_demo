@@ -6,7 +6,40 @@
 class task_queue {
 
 public:
+	explicit task_queue(int worker_count) 
+	{
+		for (int i = 0; i < worker_count; i++) 
+		{
+			workers.push_back(std::thread([this, i]() {
 
+				std::unique_lock<std::mutex> l(m);
+
+				for (;;) 
+				{
+					if (tasks.size()) 
+					{
+						auto task_to_do = tasks.front();
+
+						tasks.erase(tasks.begin());
+
+						l.unlock();
+						task_to_do();
+						l.lock();
+					}
+
+					else if (!done) 
+					{
+						cv.wait(l);
+					}
+
+					else 
+					{
+						break;
+					}
+				}
+			}));
+		}
+	}
 	explicit task_queue(int worker_count) {
 		// TODO: multiple workers
 		worker = std::thread([this]() {
