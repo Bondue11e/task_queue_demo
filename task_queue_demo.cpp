@@ -84,8 +84,29 @@ private:
 // TODO proper tests
 
 int main() {
-	task_queue q(10);
-	for (int i = 0; i != 20; ++i)
-		q.enqueue([i]() { std::cout << "hello world " << i << "\n"; });
+
+    setlocale(LC_ALL, "ru");
+
+	std::mutex m1;
+
+	task_queue q(5);
+
+	for (int i = 1; i <= 25; ++i) {
+		{
+			q.enqueue([i, &m1]() {
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(800));
+				
+				std::lock_guard<std::mutex> l(m1);
+
+				std::cout << "Итерация № " << i << "\n";
+				
+			});
+		}
+	}
+
+	int n = 0;
+	std::cin >> n;
+
 	return 0;
 }
